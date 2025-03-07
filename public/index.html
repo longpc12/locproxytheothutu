@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Filter Proxy</title>
+    <style>
+        /* Tổng thể */
+        body {
+            font-family: Arial, sans-serif;
+            background: #121212;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        .container {
+            background: #1e1e1e;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0px 4px 15px rgba(255, 255, 255, 0.1);
+            width: 600px;
+            text-align: center;
+        }
+
+        h2 {
+            margin-bottom: 20px;
+            color: #03dac6;
+        }
+
+        /* Label & Textarea */
+        label {
+            font-weight: bold;
+            display: block;
+            margin: 10px 0 5px;
+            color: #bbb;
+            text-align: left;
+        }
+
+        textarea {
+            width: 100%;
+            height: 80px;
+            padding: 10px;
+            border-radius: 8px;
+            border: none;
+            resize: none;
+            font-size: 14px;
+            font-family: monospace;
+            background: #2c2c2c;
+            color: white;
+        }
+
+        /* Nút bấm */
+        .btn {
+            width: 100%;
+            padding: 12px;
+            margin-top: 15px;
+            background: linear-gradient(135deg, #03dac6, #018786);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn:hover {
+            background: linear-gradient(135deg, #018786, #03dac6);
+        }
+
+        /* Chia khối kết quả thành 2 cột song song */
+        .result-container {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+
+        .result {
+            width: 48%;
+            padding: 15px;
+            background: #2a2a2a;
+            border-radius: 10px;
+            box-shadow: 0px 3px 10px rgba(255, 255, 255, 0.1);
+            text-align: center;
+        }
+
+        .result h3 {
+            margin-bottom: 10px;
+            color: #03dac6;
+        }
+
+        .download-btn {
+            background: linear-gradient(135deg, #bb86fc, #6200ea);
+            width: 100%;
+        }
+
+        .download-btn:hover {
+            background: linear-gradient(135deg, #6200ea, #bb86fc);
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h2>🛠 Lọc Proxy</h2>
+
+        <label>📌 Danh sách cũ:</label>
+        <textarea id="oldList"></textarea>
+
+        <label>📌 Danh sách mới:</label>
+        <textarea id="newList"></textarea>
+
+        <button class="btn" onclick="filterProxy()">🚀 Lọc</button>
+
+        <div class="result-container">
+            <div class="result">
+                <h3>✅ Danh sách mới theo thứ tự:</h3>
+                <textarea id="sortedList" readonly></textarea>
+                <button class="btn download-btn" onclick="downloadFile('sortedNewList')">⬇️ Tải về</button>
+            </div>
+
+            <div class="result">
+                <h3>⚡ Danh sách chỉ có trong list mới:</h3>
+                <textarea id="uniqueList" readonly></textarea>
+                <button class="btn download-btn" onclick="downloadFile('uniqueNewItems')">⬇️ Tải về</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function filterProxy() {
+            const oldList = document.getElementById("oldList").value;
+            const newList = document.getElementById("newList").value;
+
+            fetch("/filter", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ oldList, newList })
+            })
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById("sortedList").value = data.sortedNewList.join("\n");
+                document.getElementById("uniqueList").value = data.uniqueNewItems.join("\n");
+            })
+            .catch(error => console.error("Lỗi:", error));
+        }
+
+        function downloadFile(type) {
+            const data = type === "sortedNewList"
+                ? document.getElementById("sortedList").value
+                : document.getElementById("uniqueList").value;
+
+            if (!data) {
+                alert("Không có dữ liệu để tải!");
+                return;
+            }
+
+            const url = `/download?data=${encodeURIComponent(data)}&type=${type}`;
+            window.location.href = url;
+        }
+    </script>
+</body>
+</html>
