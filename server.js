@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const PORT = 3000;
+const port = process.env.PORT || 3000;
 
 // Cấu hình để phục vụ file tĩnh trong thư mục "public"
 app.use(express.static("public"));
@@ -65,6 +65,6 @@ app.get("/download", (req, res) => {
 });
 
 // Chạy server
-app.listen(PORT, () => {
-    console.log(`Server đang chạy tại: http://localhost:${PORT}`);
-});
+app.listen(port, () => {
+    console.log(`Server is running on ${port}`);
+  });
