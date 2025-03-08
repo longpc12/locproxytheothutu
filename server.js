@@ -3,7 +3,7 @@ const fs = require("fs");
 const path = require("path");
 
 const app = express();
-const port = process.env.PORT || 3000;
+const PORT = process.env.PORT || 3000;
 
 // Cấu hình để phục vụ file tĩnh trong thư mục "public"
 app.use(express.static("public"));
@@ -53,8 +53,8 @@ app.get("/download", (req, res) => {
         fileName = `proxy_${randomString}.txt`;
     }
 
-    // Ghi dữ liệu vào file
-    const filePath = path.join(__dirname, fileName);
+    // Ghi dữ liệu vào file tạm thời
+    const filePath = path.join("/tmp", fileName);
     fs.writeFileSync(filePath, data.replace(/,/g, "\n"), "utf8");
 
     // Gửi file cho người dùng
@@ -64,7 +64,7 @@ app.get("/download", (req, res) => {
     });
 });
 
-// Chạy server
-app.listen(port, () => {
-    console.log(`Server is running on ${port}`);
-  });
+// Khởi động server
+app.listen(PORT, () => {
+    console.log(`Server đang chạy tại: http://localhost:${PORT}`);
+});
